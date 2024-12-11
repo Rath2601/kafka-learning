@@ -23,6 +23,17 @@ A message queue is a component of messaging middleware solutions that enables in
 ## Kafka internal
 ### Kafka Architecture - Key Characteristics
 
+#### Cluster basics
+
+* We can have multiple partition of same topic in same broker.
+* number of replicas should be equal to number of broker (it can be different but it would not be optimum setup to have fault tolerance)
+
+#### Partitions (**UNIT OF PARALLELISM**)
+
+* more partition has good throughput but it would come along with overhead. (we must cautiously choose number of partitions)
+
+* because of this producer write parallely and consumer read parallely.
+
 #### Consumer Groups and Partition Assignment
 1. **Same Group ID**:
    - Consumers within the same group share partitions.
@@ -56,6 +67,9 @@ A message queue is a component of messaging middleware solutions that enables in
   - **Partition**: Specifies the partition (optional).
   - **Topic**: The topic name.
 
+* Multiple message(event) can't be stored in an Offset.
+* Single message can't be split between multiple offsets or multiple partitions even if the message is large. 
+
 #### Kafka Consumer Groups and Broadcasting
 1. **Independent Consumption**:
    - Multiple consumer groups can consume the same topic independently without interference.
@@ -69,7 +83,7 @@ A message queue is a component of messaging middleware solutions that enables in
 * **Problem**: ZooKeeper struggles with scalability, especially for write-heavy operations.
 * **Challenge**: High number of offsets due to consumer-count * partition-count.
 #### Kafka Offset Storage (Post-0.8.1.1)
-* **New Method**: Consumers commit offsets in Kafka itself.
+* **New Method**: Consumers commit offsets in Kafka topic itself.
 * Offsets are written to a durable, replicated, and highly available topic.
 * **Durability & Availability**: Ensures that offset data is highly available and resilient.
 
