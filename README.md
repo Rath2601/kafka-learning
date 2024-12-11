@@ -44,6 +44,8 @@ A message queue is a component of messaging middleware solutions that enables in
        - **1 Consumer** → Reads all 5 partitions.
        - **2 Consumers** → Kafka distributes 2-3 partitions among them.
        - **5 Consumers** → Each gets 1 partition.
+4. **Consumer group functioning**:
+   If one consumer goes down in a consumer group, the remaining consumer will take over the partitions that the failed consumer was consuming from. (**this maintains fault tolerance and ensures message processing continuity**)
          
 #### Message Format
 - Messages include:
@@ -70,6 +72,5 @@ A message queue is a component of messaging middleware solutions that enables in
 * **New Method**: Consumers commit offsets in Kafka itself.
 * Offsets are written to a durable, replicated, and highly available topic.
 * **Durability & Availability**: Ensures that offset data is highly available and resilient.
-
 
 
