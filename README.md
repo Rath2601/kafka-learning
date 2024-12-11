@@ -62,6 +62,14 @@ A message queue is a component of messaging middleware solutions that enables in
 3. **Offset Tracking**:
    - Each group maintains its own offsets, ensuring isolated and independent message processing.
 
+#### Consumer Offset Storage (Pre-0.8.1.1)
+* **Old Method**: Offsets were stored in ZooKeeper.
+* **Problem**: ZooKeeper struggles with scalability, especially for write-heavy operations.
+* **Challenge**: High number of offsets due to consumer-count * partition-count.
+#### Kafka Offset Storage (Post-0.8.1.1)
+* **New Method**: Consumers commit offsets in Kafka itself.
+* Offsets are written to a durable, replicated, and highly available topic.
+* **Durability & Availability**: Ensures that offset data is highly available and resilient.
 
 
 
