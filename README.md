@@ -20,4 +20,4 @@
 | **Pub-Sub** | Amazon SNS, Google Cloud Pub/Sub | Fan-out one event to many services at once (e.g. "order placed" → inventory + email + analytics) |
 | **Event Streaming** | Apache Kafka, Confluent (managed Kafka), Amazon Kinesis | Replayable event backbone / real-time analytics (e.g. transactions consumed by fraud + ledger + analytics, replayable) |
 
-Kafka deep dive : 
+Kafka deep dive : [Read here](./kafka_deepdive.md)
