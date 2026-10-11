@@ -106,3 +106,39 @@
 ###### Share Groups (native queue semantics)
 - **Kafka 4.0** added **Queues for Kafka via Share Groups** — multiple consumers can **share a single partition** (classic competing-consumers / queue style), which the old one-consumer-per-partition rule prevented.
 ---
+
+| Confluent Platform (CP) Version | Underlying Apache Kafka Version |
+| CP 8.3.x	| Apache Kafka 4.3.x / 4.x equivalents | 
+| CP 8.2.x / 8.1.x / 8.0.x	| Apache Kafka 4.0.x / 4.1.x / 4.2.x streams | 
+| CP 7.9.x	| Apache Kafka 3.9.x | 
+| CP 7.8.x	| Apache Kafka 3.8.x | 
+| CP 7.7.x	| Apache Kafka 3.7.x | 
+| CP 7.6.x	| Apache Kafka 3.6.x | 
+
+---
+
+
+##### PRODUCTION ISSUE RESOLUTION
+###### setup
+- used same groupId across microservice (kafka treated as single group)
+- group co-ordinator: manages the consumer group's state, tracks heartbeats, handles member joins and leaves, and triggers rebalances
+- rebalance : redistributing partitions among group members. **Triggers:** member joins, leaves, dies (missed heartbeats / `session.timeout.ms`), slow poll (`max.poll.interval.ms`), or partitions added.
+###### rebalance protocol
+- **Eager / stop-the-world** (default, RangeAssignor): all revoke everything →
+  reassign → rejoin. Whole group pauses. ❌ Disruptive.
+- **Cooperative / incremental** (CooperativeStickyAssignor, Kafka 2.4+): only
+  moving partitions revoked; rest keep running. ✅
+- **KIP-848** (broker-driven, Kafka 4.0 / CP 8 only): smoothest, no sync barrier.
+###### Why rebalancing hurt (our setup: CP 7.5.3 / Kafka 3.5 / ZK)
+- On eager protocol → every rebalance = group-wide pause.
+- Kubernetes churn: rolling restarts, pod evictions, autoscaling, liveness probes
+  → each looks like a member change → rebalance.
+- Two services shared one `group.id` → every pod event on EITHER triggered one.
+###### Why duplicates happen
+- Kafka is **at-least-once** by default.
+- `max-poll-records=200` → up to 200 records held in memory per poll.
+- `ack-mode=record` commits after each record, but if a partition is revoked
+  mid-batch, the unprocessed/uncommitted tail is abandoned.
+- New owner resumes from last committed offset → **re-reads = duplicates**.
+- NOT caused by `auto-offset-reset=latest` (group already had offsets).
+- Fix = **idempotency** (dedupe key). Correct permanent design, not a band-aid.
