@@ -108,6 +108,7 @@
 ---
 
 | Confluent Platform (CP) Version | Underlying Apache Kafka Version |
+|---|---|
 | CP 8.3.x	| Apache Kafka 4.3.x / 4.x equivalents | 
 | CP 8.2.x / 8.1.x / 8.0.x	| Apache Kafka 4.0.x / 4.1.x / 4.2.x streams | 
 | CP 7.9.x	| Apache Kafka 3.9.x | 
